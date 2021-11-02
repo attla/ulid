@@ -4,57 +4,8 @@ namespace Attla\Ulid;
 
 use Attla\Ulid\Exception\InvalidUlidStringException;
 
-class Ulid
+class Ulid extends Factory
 {
-    /**
-     * Encoding chars
-     *
-     * @var string
-     */
-    public const ENCODING_CHARS = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
-
-    /**
-     * Encoding chars length
-     *
-     * @var int
-     */
-    public const ENCODING_LENGTH = 32;
-
-    /**
-     * ULID time max value
-     *
-     * @var int
-     */
-    public const TIME_MAX = 281474976710655;
-
-    /**
-     * ULID time part length
-     *
-     * @var int
-     */
-    public const TIME_LENGTH = 10;
-
-    /**
-     * ULID random part length
-     *
-     * @var int
-     */
-    public const RANDOM_LENGTH = 16;
-
-    /**
-     * Last time the ULID was generated
-     *
-     * @var int
-     */
-    private static $lastGenTime = 0;
-
-    /**
-     * Last random chars generated
-     *
-     * @var array
-     */
-    private static $lastRandChars = [];
-
     /**
      * The time part of the ULID
      *
@@ -76,90 +27,11 @@ class Ulid
      */
     private $lowercase;
 
-    private function __construct(string $time, string $randomness, bool $lowercase = false)
+    public function __construct(string $time, string $randomness, bool $lowercase = false)
     {
         $this->time = $time;
         $this->randomness = $randomness;
         $this->lowercase = $lowercase;
-    }
-
-    /**
-     * Create a ULID from string
-     *
-     * @param string $value The ULID string
-     * @param boolean $lowercase True to output lowercase ULIDs
-     * @return self
-     */
-    public static function fromString(string $value, bool $lowercase = false): self
-    {
-        if (strlen($value) !== static::TIME_LENGTH + static::RANDOM_LENGTH) {
-            throw new InvalidUlidStringException('Invalid ULID string (wrong length): ' . $value);
-        }
-
-        // Convert to uppercase for regex. Doesn't matter for output later, that is determined by $lowercase.
-        $value = strtoupper($value);
-
-        if (!preg_match(sprintf('!^[%s]{%d}$!', static::ENCODING_CHARS, static::TIME_LENGTH + static::RANDOM_LENGTH), $value)) {
-            throw new InvalidUlidStringException('Invalid ULID string (wrong characters): ' . $value);
-        }
-
-        return new static(substr($value, 0, static::TIME_LENGTH), substr($value, static::TIME_LENGTH, static::RANDOM_LENGTH), $lowercase);
-    }
-
-    /**
-     * Create a ULID using the given timestamp
-     *
-     * @param int $milliseconds Number of milliseconds since the UNIX epoch for which to generate this ULID
-     * @param bool $lowercase True to output lowercase ULIDs
-     * @return Ulid Returns a ULID object for the given microsecond time
-     */
-    public static function fromTimestamp(int $milliseconds, bool $lowercase = false): self
-    {
-        $duplicateTime = $milliseconds === static::$lastGenTime;
-
-        static::$lastGenTime = $milliseconds;
-
-        $timeChars = '';
-        $randChars = '';
-
-        $encodingChars = static::ENCODING_CHARS;
-
-        for ($i = static::TIME_LENGTH - 1; $i >= 0; $i--) {
-            $mod = $milliseconds % static::ENCODING_LENGTH;
-            $timeChars = $encodingChars[$mod] . $timeChars;
-            $milliseconds = ($milliseconds - $mod) / static::ENCODING_LENGTH;
-        }
-
-        if (!$duplicateTime) {
-            for ($i = 0; $i < static::RANDOM_LENGTH; $i++) {
-                static::$lastRandChars[$i] = random_int(0, 31);
-            }
-        } else {
-            // If the timestamp hasn't changed since last push,
-            // use the same random number, except incremented by 1.
-            for ($i = static::RANDOM_LENGTH - 1; $i >= 0 && static::$lastRandChars[$i] === 31; $i--) {
-                static::$lastRandChars[$i] = 0;
-            }
-
-            static::$lastRandChars[$i]++;
-        }
-
-        for ($i = 0; $i < static::RANDOM_LENGTH; $i++) {
-            $randChars .= $encodingChars[static::$lastRandChars[$i]];
-        }
-
-        return new static($timeChars, $randChars, $lowercase);
-    }
-
-    /**
-     * Create a ULID using the current time
-     *
-     * @param boolean $lowercase True to output lowercase ULIDs
-     * @return self
-     */
-    public static function generate(bool $lowercase = false): self
-    {
-        return static::fromTimestamp((int) (microtime(true) * 1000), $lowercase);
     }
 
     /**
@@ -203,13 +75,33 @@ class Ulid
     }
 
     /**
+     * Get full ULID string
+     *
+     * @return string
+     */
+    public function toString(): string
+    {
+        return $this->lowercase ? strtolower($this->time . $this->randomness) : $this->time . $this->randomness;
+    }
+
+    /**
+     * Alias to get a ULID string
+     *
+     * @return string
+     */
+    public function get(): string
+    {
+        return $this->toString();
+    }
+
+    /**
      * Return the ULID when treated as a string
      *
      * @return string
      */
     public function __toString(): string
     {
-        return ($value = $this->time . $this->randomness) && $this->lowercase ? strtolower($value) : strtoupper($value);
+        return $this->toString();
     }
 
     /**
@@ -224,14 +116,14 @@ class Ulid
         $carry = 0;
 
         foreach ($timeChars as $index => $char) {
-            if (($encodingIndex = strripos(static::ENCODING_CHARS, $char)) === false) {
+            if (($encodingIndex = strripos(Factory::ENCODING_CHARS, $char)) === false) {
                 throw new InvalidUlidStringException('Invalid ULID character: ' . $char);
             }
 
-            $carry += ($encodingIndex * pow(static::ENCODING_LENGTH, $index));
+            $carry += ($encodingIndex * pow(Factory::ENCODING_LENGTH, $index));
         }
 
-        if ($carry > static::TIME_MAX) {
+        if ($carry > Factory::TIME_MAX) {
             throw new InvalidUlidStringException('Invalid ULID string: timestamp too large');
         }
 

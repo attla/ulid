@@ -46,24 +46,27 @@ composer require attla/ulid
 ## Usage
 
 ```php
-use Attla\Ulid;
+use Attla\Ulid\Factory as UlidFactory;
 
-$ulid = Ulid::generate();
-echo (string) $ulid; // 01B8KYR6G8BC61CE8R6K2T16HY
+$ulid = UlidFactory::generate();
+echo $ulid; // 01B8KYR6G8BC61CE8R6K2T16HY
+echo $ulid->generate(); // 01B8KYR6G8BC61CE8R6K2T16HZ
 
 // Or if you prefer a lowercased output
-$ulid = Ulid::generate(true);
-echo (string) $ulid; // 01b8kyr6g8bc61ce8r6k2t16hy
+$ulid = UlidFactory::generate(true);
+echo $ulid->get(); // 01b8kyr6g8bc61ce8r6k2t16hy
 
 // If you need the timestamp from an ULID instance
-$ulid = Ulid::generate();
+$ulid = UlidFactory::generate();
 echo $ulid->toTimestamp(); // 1561622862
 
 // You can also generate a ULID for a specific UNIX-time in milliseconds
-$ulid = Ulid::fromTimestamp(1593048767015);
+$ulid = UlidFactory::fromTimestamp(1593048767015);
 // or with a lower cased output: $ulid = Ulid::fromTimestamp(1593048767015, true);
-echo (string) $ulid; // 01EBMHP6H7TT1Q4B7CA018K5MQ
+echo $ulid->toString(); // 01EBMHP6H7TT1Q4B7CA018K5MQ
 ```
+
+Use the methods `get()` or `toString()` to get the ULID as a string on ULID instances.
 
 ### Migrations
 
