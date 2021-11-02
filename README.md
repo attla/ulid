@@ -67,17 +67,17 @@ echo (string) $ulid; // 01EBMHP6H7TT1Q4B7CA018K5MQ
 
 ### Migrations
 
-When using the migration you should change $table->increments('id') to:
+When using the migration you should change $table->increments('id') or $table->id() to:
 
 ```php
-$table->char('id', 26)->primary();
+$table->ulid();
 ```
 
 > Simply, the schema seems something like this.
 
 ```php
 Schema::create('items', function (Blueprint $table) {
-  $table->char('id', 26)->primary();
+  $table->ulid();
   ....
   ....
   $table->timestamps();
@@ -88,11 +88,23 @@ If the related model is using an ULID, the column type should reflect that also.
 
 ``` php
 Schema::create('items', function (Blueprint $table) {
-  $table->char('id', 26)->primary();
+  $table->ulid();
   ....
   // related model that uses ULID
-  $table->char('category_id', 26);
-  $table->foreign('category_id')->references('id')->on('categories');
+  $table->foreignUlid('category_id');
+  ....
+  $table->timestamps();
+});
+```
+
+The ULID blueprint parameter is optional. But below is an example of how to use it.
+
+```php
+Schema::create('categories', function (Blueprint $table) {
+  $table->ulid($ulidLength);
+  ....
+  // related model that uses ULID
+  $table->foreignUlid($column, $foreignColumn, $foreignTable, $ulidLength);
   ....
   $table->timestamps();
 });

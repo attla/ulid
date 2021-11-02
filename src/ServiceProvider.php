@@ -19,7 +19,7 @@ class ServiceProvider extends BaseServiceProvider
             $this->char('id', $length)->primary();
         });
 
-        Blueprint::macro('foreignUlid', function ($name, $length = 26, $reference = 'id', $onTable = null) {
+        Blueprint::macro('foreignUlid', function ($name, $reference = 'id', $onTable = null, $length = 26) {
             $this->char($name, $length);
             $this->foreign($name)->references($reference)->on($onTable ?? Str::plural(Str::beforeLast($name, '_' . $reference)));
         });
