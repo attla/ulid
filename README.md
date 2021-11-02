@@ -62,7 +62,7 @@ echo $ulid->toTimestamp(); // 1561622862
 
 // You can also generate a ULID for a specific UNIX-time in milliseconds
 $ulid = UlidFactory::fromTimestamp(1593048767015);
-// or with a lower cased output: $ulid = Ulid::fromTimestamp(1593048767015, true);
+// or with a lower cased output: $ulid = UlidFactory::fromTimestamp(1593048767015, true);
 echo $ulid->toString(); // 01EBMHP6H7TT1Q4B7CA018K5MQ
 ```
 
