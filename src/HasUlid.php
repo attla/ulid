@@ -19,7 +19,7 @@ trait HasUlid
 
         static::saving(function ($model) {
             $originalUlid = $model->getOriginal('id');
-            if ($originalUlid !== $model->id) {
+            if ($originalUlid && $originalUlid !== $model->id) {
                 $model->id = $originalUlid;
             }
         });
