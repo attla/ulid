@@ -5,6 +5,13 @@ namespace Attla\Ulid;
 trait HasUlid
 {
     /**
+     * The "type" of the primary key ID
+     *
+     * @var string
+     */
+    protected $keyType = 'string';
+
+    /**
      * Boot the trait on the model
      *
      * @return void
