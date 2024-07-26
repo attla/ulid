@@ -60,9 +60,9 @@ class Factory
      *
      * @param string $value The ULID string
      * @param boolean $lowercase True to output lowercase ULIDs
-     * @return self
+     * @return Ulid
      */
-    public static function fromString(string $value, bool $lowercase = false): self
+    public static function fromString(string $value, bool $lowercase = false): Ulid
     {
         $ulidLength = static::TIME_LENGTH + static::RANDOM_LENGTH;
 
@@ -87,7 +87,7 @@ class Factory
      * @param bool $lowercase True to output lowercase ULIDs
      * @return Ulid Returns a ULID object for the given microsecond time
      */
-    public static function fromTimestamp(int $milliseconds, bool $lowercase = false): self
+    public static function fromTimestamp(int $milliseconds, bool $lowercase = false): Ulid
     {
         $duplicateTime = $milliseconds === static::$lastGenTime;
 
@@ -129,9 +129,9 @@ class Factory
      * Create a ULID using the current time
      *
      * @param boolean $lowercase True to output lowercase ULIDs
-     * @return self
+     * @return Ulid
      */
-    public static function generate(bool $lowercase = false): self
+    public static function generate(bool $lowercase = false): Ulid
     {
         return static::fromTimestamp((int) (microtime(true) * 1000), $lowercase);
     }
