@@ -36,6 +36,11 @@
         "phpbench/phpbench": "^1.1.3",
         "symfony/phpunit-bridge": "^5.1"
     },
+    "scripts": {
+        "benchmark": "./vendor/bin/phpbench run benchmarks/UlidBench.php --report=aggregate --retry-threshold=5",
+        "bench": "composer benchmark",
+        "test": "./vendor/bin/phpunit"
+    },
     "extra": {
         "laravel": {
             "providers": [

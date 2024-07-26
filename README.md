@@ -144,6 +144,12 @@ echo $item->id;
 composer test
 ```
 
+### Benchmark
+
+``` bash
+composer benchmark
+```
+
 ## License
 
 This package is licensed under the [MIT license](LICENSE) © [Octha](https://octha.com).
